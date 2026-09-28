@@ -533,10 +533,10 @@ window.onSetChange = function(exIdx, setIdx) {
 
   if (!workoutData[exIdx]) workoutData[exIdx] = {};
 
-  if (weight || reps) {
+  if (weight !== '' || reps !== '') {
     workoutData[exIdx][setIdx] = {
-      weight: weight ? parseFloat(weight) : null,
-      reps: reps ? parseInt(reps) : null
+      weight: weight !== '' ? parseFloat(weight) : null,
+      reps: reps !== '' ? parseInt(reps) : null
     };
   } else {
     delete workoutData[exIdx][setIdx];
@@ -551,14 +551,14 @@ window.onSetChange = function(exIdx, setIdx) {
   // Also trigger the E1RM display update
   window.onSetInput(exIdx, setIdx);
 
-  if (weight && reps) startRestTimer();
+  if (weight !== '' && reps !== '') startRestTimer();
 };
 
 function updateSetRowStatus(exIdx, setIdx) {
   const row = document.getElementById(`set-${exIdx}-${setIdx}`);
   if (!row) return;
   const data = workoutData[exIdx]?.[setIdx];
-  row.classList.toggle('completed', !!(data && data.weight && data.reps));
+  row.classList.toggle('completed', !!(data && data.weight != null && data.reps != null));
 }
 
 function updateExerciseStatus(exIdx) {
@@ -568,7 +568,7 @@ function updateExerciseStatus(exIdx) {
   let completed = 0;
   for (let s = 0; s < ex.sets; s++) {
     const data = workoutData[exIdx]?.[s];
-    if (data && data.weight && data.reps) completed++;
+    if (data && data.weight != null && data.reps != null) completed++;
   }
   const statusEl = document.getElementById(`status-${exIdx}`);
   const checkEl = document.getElementById(`check-${exIdx}`);
@@ -583,7 +583,7 @@ function updateProgress() {
     total += ex.sets;
     for (let s = 0; s < ex.sets; s++) {
       const data = workoutData[exIdx]?.[s];
-      if (data && data.weight && data.reps) done++;
+      if (data && data.weight != null && data.reps != null) done++;
     }
   });
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
@@ -667,12 +667,13 @@ window.saveWorkout = async function() {
     const sets = {};
     for (let s = 0; s < ex.sets; s++) {
       const data = workoutData[exIdx]?.[s];
-      if (data && (data.weight || data.reps)) { sets[s] = data; hasData = true; }
+      if (data && (data.weight != null || data.reps != null)) { sets[s] = data; hasData = true; }
     }
     if (Object.keys(sets).length > 0) exercises.push({ name: ex.name, sets });
   });
 
   if (!hasData) { showToast('Nothing to save — log some sets first'); return; }
+  if (!confirm('Save this workout?')) return;
 
   // Build flat rows for Google Sheets (one row per set)
   const dateStr = new Date().toISOString();
@@ -769,24 +770,60 @@ function loadAutoSave() {
   const saved = localStorage.getItem(autoSaveKey());
   if (saved) {
     workoutData = JSON.parse(saved);
-    const workout = getWorkout(currentWeek, currentDay);
-    workout.exercises.forEach((ex, exIdx) => {
-      for (let s = 0; s < ex.sets; s++) {
-        const data = workoutData[exIdx]?.[s];
-        if (data) {
-          const wEl = document.getElementById(`weight-${exIdx}-${s}`);
-          const rEl = document.getElementById(`reps-${exIdx}-${s}`);
-          if (wEl && data.weight) wEl.value = data.weight;
-          if (rEl && data.reps) rEl.value = data.reps;
-          updateSetRowStatus(exIdx, s);
-          // Trigger E1RM display for loaded data
-          window.onSetInput(exIdx, s);
-        }
-      }
-      updateExerciseStatus(exIdx);
-    });
-    updateProgress();
+    applyWorkoutDataToUI();
+    return;
   }
+
+  // If no autosave, check if this workout was already completed (loaded from Sheets)
+  loadFromSheetData();
+}
+
+// Load previously saved workout data from Google Sheets for the current week+day
+function loadFromSheetData() {
+  if (!sheetData || sheetData.length === 0) return;
+  const workout = getWorkout(currentWeek, currentDay);
+
+  // Find rows in sheetData matching this week + day
+  const matchingRows = sheetData.filter(r => r.week === currentWeek && r.day === workout.dayName);
+  if (matchingRows.length === 0) return;
+
+  // Build workoutData from sheet rows
+  workoutData = {};
+  workout.exercises.forEach((ex, exIdx) => {
+    const exRows = matchingRows.filter(r => r.exercise === ex.name);
+    if (exRows.length > 0) {
+      workoutData[exIdx] = {};
+      exRows.forEach(r => {
+        workoutData[exIdx][r.set - 1] = {
+          weight: r.weight,
+          reps: r.reps
+        };
+      });
+    }
+  });
+
+  if (Object.keys(workoutData).length > 0) {
+    applyWorkoutDataToUI();
+  }
+}
+
+function applyWorkoutDataToUI() {
+  const workout = getWorkout(currentWeek, currentDay);
+  workout.exercises.forEach((ex, exIdx) => {
+    for (let s = 0; s < ex.sets; s++) {
+      const data = workoutData[exIdx]?.[s];
+      if (data) {
+        const wEl = document.getElementById(`weight-${exIdx}-${s}`);
+        const rEl = document.getElementById(`reps-${exIdx}-${s}`);
+        if (wEl && data.weight != null) wEl.value = data.weight;
+        if (rEl && data.reps != null) rEl.value = data.reps;
+        updateSetRowStatus(exIdx, s);
+        window.onSetInput(exIdx, s);
+      }
+    }
+    updateExerciseStatus(exIdx);
+  });
+  updateProgress();
 }
 
 function getHistory() {

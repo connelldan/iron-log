@@ -1,43 +1,46 @@
-# Astro Starter Kit: Minimal
+# Iron Log
 
-```sh
-npm create astro@latest -- --template minimal
+A personal workout tracking app built for a 13-week periodized strength program. This is a single-user app I built for myself to log my training and track progress over time.
+
+## What It Does
+
+- **4-day training split** with exercises based on [Tanner Shuck's top 25 exercises for natural lifters](https://www.youtube.com/@TannerTrains-h1s)
+- **13-week periodized program** cycling through Hypertrophy → Strength Building → Strength Peak → Deload
+- **Log weight and reps** for each set, with a live **estimated 1RM** calculation (Epley formula)
+- **Previous session data** shown per exercise so I know what to beat
+- **Rest timer** that auto-starts after logging a set
+- **Swap or delete exercises** on any given day if I want to change things up
+
+## Google Sheets as a Database
+
+Instead of using a traditional database, all workout data is saved directly to a **Google Sheet** via a Google Apps Script web app. Each set gets its own row with columns for Date, Week, Day, Phase, Exercise, Set #, Weight, Reps, and Estimated 1RM.
+
+This lets me:
+- Build my own charts and graphs in Google Sheets
+- Track trends over time with pivot tables
+- Own my data in a format I can actually use
+
+The app syncs from the sheet on page load so previous session data is always up to date.
+
+## Tech Stack
+
+- **Astro** — static site framework
+- **Vanilla JS** — all client-side, no frameworks
+- **Google Sheets + Apps Script** — data storage and API
+- **Vercel** — hosting
+
+## Running Locally
+
+```bash
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Program Structure
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+| Day | Exercises |
+|-----|-----------|
+| Day 1 | Cleans, Back Squats |
+| Day 2 | Bench Press, Overhead Press, Weighted Strict Pull-Ups, Bent Over Barbell Row, Dips |
+| Day 3 | Conventional Deadlifts, Bulgarian Split Squats |
+| Day 4 | Incline Bench Press, Rows (T-Bar or Seal Row), Weighted Strict Pull-Ups, Dips |
