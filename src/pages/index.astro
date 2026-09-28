@@ -1,0 +1,89 @@
+---
+import Layout from '../layouts/Layout.astro';
+import '../styles/global.css';
+---
+
+<Layout title="Iron Log — 13-Week Program" description="13-week periodized workout program built around Tanner Schuck's top 25 exercises. Track sets, reps, and weight with full history.">
+  <div class="ambient-bg"></div>
+  <div id="app">
+    <header class="header">
+      <h1>Iron Log</h1>
+    </header>
+
+    <div class="week-selector">
+      <button class="week-nav-btn" id="prevWeek" onclick="changeWeek(-1)">‹</button>
+      <div class="week-info">
+        <div class="week-number" id="weekNumber">Week 1 of 13</div>
+        <div class="week-dates" id="weekDates"></div>
+      </div>
+      <button class="week-nav-btn" id="nextWeek" onclick="changeWeek(1)">›</button>
+    </div>
+
+    <div style="text-align:center">
+      <div class="phase-badge" id="phaseBadge">
+        <span class="phase-dot"></span>
+        <span id="phaseName"></span>
+      </div>
+      <div class="phase-note" id="phaseNote"></div>
+    </div>
+
+    <nav class="nav-tabs" id="dayTabs"></nav>
+
+    <div class="view-toggle">
+      <button class="view-btn active" data-view="workout" id="workoutViewBtn">Workout</button>
+      <button class="view-btn" data-view="calendar" id="calendarViewBtn">Calendar</button>
+      <button class="view-btn" data-view="history" id="historyViewBtn">History</button>
+    </div>
+
+    <div class="workout-container active" id="workoutView">
+      <div class="progress-bar-container">
+        <div class="progress-header">
+          <span class="progress-label">Workout Progress</span>
+          <span class="progress-value" id="progressValue">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+      <div id="exerciseList"></div>
+      <button class="save-workout-btn" id="saveBtn" onclick="saveWorkout()">Save Workout</button>
+      <button class="clear-workout-btn" onclick="clearCurrentWorkout()">Clear Current Entries</button>
+    </div>
+
+    <div class="calendar-container" id="calendarView"></div>
+    <div class="history-container" id="historyView"></div>
+  </div>
+
+  <div class="rest-timer" id="restTimer">
+    <div class="timer-pill">
+      <div>
+        <div class="timer-label">Rest</div>
+        <div class="timer-time" id="timerDisplay">2:00</div>
+      </div>
+      <div class="timer-controls">
+        <button class="timer-btn add" onclick="addRestTime(30)">+30</button>
+        <button class="timer-btn skip" onclick="skipTimer()">✕</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <!-- Swap Modal -->
+  <div class="modal-overlay" id="swapModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="swapModalTitle">Swap Exercise</span>
+        <button class="modal-close" onclick="closeSwapModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="modal-search" id="swapSearch" placeholder="Search exercises..." oninput="filterSwapOptions()">
+        <div id="swapOptions"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-reset-btn" id="resetDayBtn" onclick="resetDayToDefault()">↺ Reset Day to Default</button>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline src="/scripts/app.js"></script>
+</Layout>
