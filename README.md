@@ -1,11 +1,11 @@
 # Iron Log
 
-A personal workout tracking app built for a 13-week periodized strength program. This is a single-user app I built for myself to log my training and track progress over time.
+A personal workout tracking app built for a 15-week periodized strength program. This is a single-user app I built for myself to log my training and track progress over time.
 
 ## What It Does
 
 - **4-day training split** with exercises based on [Tanner Shuck's top 25 exercises for natural lifters](https://www.youtube.com/@TannerTrains-h1s)
-- **13-week periodized program** cycling through Hypertrophy → Strength Building → Strength Peak → Deload
+- **15-week periodized program** cycling through Hypertrophy → Strength Building → Strength Peak → Deload
 - **Log weight and reps** for each set, with a live **estimated 1RM** calculation (Epley formula)
 - **Previous session data** shown per exercise so I know what to beat
 - **Rest timer** that auto-starts after logging a set
@@ -42,5 +42,5 @@ npm run dev
 |-----|-----------|
 | Day 1 | Cleans, Back Squats |
 | Day 2 | Bench Press, Overhead Press, Weighted Strict Pull-Ups, Bent Over Barbell Row, Dips |
-| Day 3 | Conventional Deadlifts, Bulgarian Split Squats |
+| Day 3 | Traditional Deadlift, Bulgarian Split Squats |
 | Day 4 | Incline Bench Press, Rows (T-Bar or Seal Row), Weighted Strict Pull-Ups, Dips |

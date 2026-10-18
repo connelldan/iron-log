@@ -3,84 +3,192 @@ import Layout from '../layouts/Layout.astro';
 import '../styles/global.css';
 ---
 
-<Layout title="Iron Log — 13-Week Program" description="13-week periodized workout program built around Tanner Schuck's top 25 exercises. Track sets, reps, and weight with full history.">
-  <div class="ambient-bg"></div>
+<Layout title="Iron Log — 15-Week Program" description="15-week periodized workout program built around Tanner Schuck's top 25 exercises. Track sets, reps, and weight with full history.">
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="glow-orb orb-primary"></div>
+    <div class="glow-orb orb-cyan"></div>
+    <div class="glow-orb orb-warm"></div>
+    <div class="subtle-grid"></div>
+  </div>
+
   <div id="app">
+    <!-- TOP HEADER -->
     <header class="header">
-      <h1>Iron Log</h1>
+      <div class="brand-bar">
+        <div class="brand-title-wrap">
+          <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>IRON LOG</h1>
+            <span class="brand-tag">15-WEEK MACROCYCLE</span>
+          </div>
+        </div>
+
+        <div class="sync-badge" id="syncStatus" title="Google Sheets live sync status">
+          <span class="sync-pulse"></span>
+          <span class="sync-label" id="syncLabel">SYNCED</span>
+        </div>
+      </div>
     </header>
 
+    <!-- WEEK SELECTOR -->
     <div class="week-selector">
-      <button class="week-nav-btn" id="prevWeek" onclick="changeWeek(-1)">‹</button>
+      <button class="week-nav-btn prev" id="prevWeek" onclick="changeWeek(-1)" aria-label="Previous week">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+
       <div class="week-info">
-        <div class="week-number" id="weekNumber">Week 1 of 13</div>
+        <div class="week-header-row">
+          <span class="week-number" id="weekNumber">Week 1 of 15</span>
+        </div>
+        <div class="week-timeline" id="weekTimeline" aria-label="15-week progression"></div>
         <div class="week-dates" id="weekDates"></div>
       </div>
-      <button class="week-nav-btn" id="nextWeek" onclick="changeWeek(1)">›</button>
+
+      <button class="week-nav-btn next" id="nextWeek" onclick="changeWeek(1)" aria-label="Next week">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
     </div>
 
-    <div style="text-align:center">
+    <!-- PHASE CARD -->
+    <div class="phase-card-wrapper">
       <div class="phase-badge" id="phaseBadge">
         <span class="phase-dot"></span>
-        <span id="phaseName"></span>
+        <span class="phase-title" id="phaseName"></span>
+        <span class="phase-targets-pill" id="phaseTargets"></span>
       </div>
       <div class="phase-note" id="phaseNote"></div>
     </div>
 
-    <nav class="nav-tabs" id="dayTabs"></nav>
-
-    <div class="view-toggle">
-      <button class="view-btn active" data-view="workout" id="workoutViewBtn">Workout</button>
-      <button class="view-btn" data-view="calendar" id="calendarViewBtn">Calendar</button>
-      <button class="view-btn" data-view="history" id="historyViewBtn">History</button>
+    <!-- VIEW TOGGLE -->
+    <div class="view-toggle" role="tablist">
+      <button class="view-btn active" data-view="workout" id="workoutViewBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/></svg>
+        <span>Workout</span>
+      </button>
+      <button class="view-btn" data-view="calendar" id="calendarViewBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+        <span>Calendar</span>
+      </button>
+      <button class="view-btn" data-view="history" id="historyViewBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+        <span>History</span>
+      </button>
+      <button class="view-btn" data-view="progress" id="progressViewBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        <span>Progress</span>
+      </button>
     </div>
 
-    <div class="workout-container active" id="workoutView">
+    <!-- WORKOUT VIEW -->
+    <main class="workout-container active" id="workoutView">
+      <!-- DAY SPLIT SELECTOR (Clean & Squat, Press & Pull, DL & Split, Incline & Rows) -->
+      <nav class="nav-tabs" id="dayTabs" aria-label="Training day"></nav>
+
       <div class="progress-bar-container">
         <div class="progress-header">
-          <span class="progress-label">Workout Progress</span>
+          <div class="progress-title-wrap">
+            <span class="progress-label">Today's Progress</span>
+            <span class="progress-count" id="progressCount">0 / 0 sets</span>
+          </div>
           <span class="progress-value" id="progressValue">0%</span>
         </div>
         <div class="progress-track">
-          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+          <div class="progress-fill" id="progressFill" style="width:0%">
+            <span class="progress-glow-head"></span>
+          </div>
         </div>
       </div>
-      <div id="exerciseList"></div>
-      <button class="save-workout-btn" id="saveBtn" onclick="saveWorkout()">Save Workout</button>
-      <button class="clear-workout-btn" onclick="clearCurrentWorkout()">Clear Current Entries</button>
-    </div>
 
+      <div id="exerciseList"></div>
+
+      <!-- ADD EXERCISE FROM PREDEFINED DROPDOWN LIST -->
+      <div class="add-exercise-panel" id="addExercisePanel">
+        <div class="add-exercise-inner">
+          <div class="add-exercise-select-wrap">
+            <svg class="select-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"/></svg>
+            <select id="addExerciseSelect" aria-label="Select exercise to add">
+              <option value="" disabled selected>+ Select exercise to add to workout...</option>
+            </select>
+          </div>
+          <button type="button" class="add-exercise-btn" id="addExerciseBtn" onclick="addSelectedExercise()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Add Exercise</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="workout-actions">
+        <button class="save-workout-btn" id="saveBtn" onclick="saveWorkout()">
+          <span class="btn-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          </span>
+          <span class="btn-text">Save Workout</span>
+        </button>
+        <button class="clear-workout-btn" onclick="clearCurrentWorkout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          <span>Clear Entries</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- CALENDAR VIEW -->
     <div class="calendar-container" id="calendarView"></div>
+
+    <!-- HISTORY VIEW -->
     <div class="history-container" id="historyView"></div>
+
+    <!-- PROGRESS / STRENGTH STANDARDS VIEW -->
+    <div class="progress-view-container" id="progressView"></div>
   </div>
 
+  <!-- FLOATING REST TIMER HUD -->
   <div class="rest-timer" id="restTimer">
     <div class="timer-pill">
-      <div>
-        <div class="timer-label">Rest</div>
-        <div class="timer-time" id="timerDisplay">2:00</div>
+      <div class="timer-ring-wrap">
+        <div class="timer-pulse-aura"></div>
+        <div class="timer-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+      </div>
+      <div class="timer-info">
+        <span class="timer-label">REST TIMER</span>
+        <span class="timer-time" id="timerDisplay">2:00</span>
       </div>
       <div class="timer-controls">
-        <button class="timer-btn add" onclick="addRestTime(30)">+30</button>
-        <button class="timer-btn skip" onclick="skipTimer()">✕</button>
+        <button class="timer-btn add" onclick="addRestTime(30)" title="Add 30 seconds">+30s</button>
+        <button class="timer-btn skip" onclick="skipTimer()" title="Skip timer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
     </div>
   </div>
+
   <div class="toast" id="toast"></div>
 
-  <!-- Swap Modal -->
+  <!-- SWAP MODAL -->
   <div class="modal-overlay" id="swapModal">
     <div class="modal">
       <div class="modal-header">
-        <span class="modal-title" id="swapModalTitle">Swap Exercise</span>
-        <button class="modal-close" onclick="closeSwapModal()">✕</button>
+        <div class="modal-title-wrap">
+          <span class="modal-badge">EXERCISE POOL</span>
+          <span class="modal-title" id="swapModalTitle">Swap Exercise</span>
+        </div>
+        <button class="modal-close" onclick="closeSwapModal()" aria-label="Close modal">✕</button>
       </div>
       <div class="modal-body">
-        <input type="text" class="modal-search" id="swapSearch" placeholder="Search exercises..." oninput="filterSwapOptions()">
+        <div class="modal-search-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" class="modal-search" id="swapSearch" placeholder="Search exercises, categories..." oninput="filterSwapOptions()">
+        </div>
+        <div class="swap-category-chips" id="swapCategoryChips"></div>
         <div id="swapOptions"></div>
       </div>
       <div class="modal-footer">
-        <button class="modal-reset-btn" id="resetDayBtn" onclick="resetDayToDefault()">↺ Reset Day to Default</button>
+        <button class="modal-reset-btn" id="resetDayBtn" onclick="resetDayToDefault()">↺ Reset Day to Default Program</button>
       </div>
     </div>
   </div>
